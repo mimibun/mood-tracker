@@ -1,4 +1,4 @@
-import csv
+import sqlite3
 from os import system, name
 from datetime import date
 
@@ -10,6 +10,15 @@ def main():
 
 
 if __name__ == "__main__": 
+    db = sqlite3.connect("data.db")
+    dbCur = db.cursor()
+
+    dbCur.execute('''CREATE TABLE IF NOT EXISTS moods(
+                  id integer PRIMARY KEY AUTOINCREMENT,
+                  date text NOT NULL,
+                  weekday integer,
+                  mood text);''')
+    
     def menu():
         while True:
             try:
@@ -43,45 +52,37 @@ if __name__ == "__main__":
         except: pass
 
 
-    def writeMood(): # Asks for mood and appends it to the file with date included
+    def writeMood(): # Asks for mood and adds it as database entry
         clearTerminal()
         mood = input("Today I'm feeling...")
+        contentToAdd = (f"{date.today()}", f"{date.today().weekday()}", mood)
 
-        with open("mood_data.csv", "a") as mood_file:
-            writer = csv.DictWriter(mood_file, fieldnames=FIELDNAMES)
-            writer.writerow({"date": date.today(),
-                             "weekday": date.today().weekday(),
-                             "mood": mood})
-        input("Entry added! Press ANY to return to main menu...")
+        try:
+            dbCur.execute('''INSERT INTO moods(date, weekday, mood) VALUES (?,?,?)''', contentToAdd)
+            db.commit()
 
-
-    def readMoods() -> list[dict]:
-        moods = []
-        with open("mood_data.csv", "r") as mood_file:
-            moodreader = csv.DictReader(mood_file, fieldnames=FIELDNAMES)
-
-            for mood in moodreader:
-                moods.append(mood)
-                
-        return moods
+            input("Entry added! Press ANY to return to main menu...")
+        except:
+            input("ERROR: Could not write to database. Press ANY to return to main menu...")
 
 
-    def viewHistory(): # Prints csv file line by line
+    def viewHistory(): # Prints * query line by line
             clearTerminal()
-            file = readMoods()
-            print(f"Here is your history ({len(file) - 1} days):")
-            for mood in file:
-                if file.index(mood) != 0:
-                    print(f"{mood["date"]} - {DAYNAMES[int(mood["weekday"])]} - {mood["mood"]}")
+
+            dbCur.execute('''SELECT * FROM moods''')
+            entries = dbCur.fetchall()
+
+            print(f"Here is your history ({len(entries)} days):")
+            for entry in entries:
+                print(f"{entry[1]} - {DAYNAMES[int(entry[2])]} - {entry[3]}")
+
             input("Press ANY to return to main menu...")
 
 
-    def getEntryByDate(date) -> list[dict] | None: # Title of func explains what it does
-        file = readMoods()
+    def getEntryByDate(date) -> list[list] | None: # Title of func explains what it does
         try:
-            for i, e in enumerate(file):
-                if e["date"] == date:
-                    return file[i]
+            dbCur.execute(f'''SELECT * FROM moods WHERE date = "{date}"''')
+            return dbCur.fetchall()
         except:
             return None
 
@@ -93,12 +94,18 @@ if __name__ == "__main__":
 
             if choice == "exit":
                 break
-            elif getEntryByDate(choice) == None:
-                input("Wrong format or no entry with date found!")
+            elif getEntryByDate(choice): 
+                entries = getEntryByDate(choice)
+                for entry in entries:
+                    print(f"{entry[1]} - {DAYNAMES[int(entry[2])]} - {entry[3]}")
+                input("Press ANY to return to main menu...")
+            else:
+                input("ERROR: Invalid format or no entry with date found! Press ANY to return to main menu...")
                 continue
-            else: 
-                entry = getEntryByDate(choice)
-                print(f"{entry["date"]} - {DAYNAMES[int(entry["weekday"])]} - {entry["mood"]}")
 
 
     main()
+
+
+    db.commit()
+    db.close()
