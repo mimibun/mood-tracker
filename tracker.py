@@ -19,6 +19,7 @@ if __name__ == "__main__":
                   weekday integer,
                   mood text);''')
     
+    
     def menu():
         while True:
             try:
@@ -30,7 +31,6 @@ if __name__ == "__main__":
 
                 choice = int(input("What do you want to do? "))
 
-
                 match choice:
                     case 1: writeMood()
                     case 2: viewHistory()
@@ -40,7 +40,7 @@ if __name__ == "__main__":
             except KeyboardInterrupt: # Allows to exit the program
                 clearTerminal()
                 break 
-            except: continue 
+            except: continue
 
 
     def clearTerminal(): # OS independent terminal clear
@@ -66,17 +66,28 @@ if __name__ == "__main__":
             input("ERROR: Could not write to database. Press ANY to return to main menu...")
 
 
-    def viewHistory(): # Prints * query line by line
+    def viewHistory(): # Prints 'SELECT * FROM moods' query line by line
             clearTerminal()
 
             dbCur.execute('''SELECT * FROM moods''')
             entries = dbCur.fetchall()
 
-            print(f"Here is your history ({len(entries)} days):")
+            print(f"Here is your history ({len(entries)} entries and {countDays(entries)} days):")
             for entry in entries:
                 print(f"{entry[1]} - {DAYNAMES[int(entry[2])]} - {entry[3]}")
 
             input("Press ANY to return to main menu...")
+
+
+    def countDays(entries) -> int: # Counts unique days from entries
+        lastDay = None
+        days = 0
+
+        for entry in entries:
+            if entry[1] != lastDay:
+                lastDay = entry[1]
+                days += 1
+        return days
 
 
     def getEntryByDate(date) -> list[list] | None: # Title of func explains what it does
