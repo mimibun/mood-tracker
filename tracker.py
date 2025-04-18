@@ -3,7 +3,6 @@ from os import system, name
 from datetime import date
 
 DAYNAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-FIELDNAMES = ["date", "weekday", "mood"]
 
 def main():
     menu()
