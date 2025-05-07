@@ -31,7 +31,7 @@ if __name__ == "__main__":
                 choice = int(input("What do you want to do? "))
 
                 match choice:
-                    case 1: writeMood()
+                    case 1: writeEntry()
                     case 2: viewHistory()
                     case 3: promptEntryDate()
                     case _: continue
@@ -51,8 +51,15 @@ if __name__ == "__main__":
         except: pass
 
 
-    def writeMood(): # Asks for mood and adds it as database entry
-        clearTerminal()
+    def writeEntry(): # Asks for mood and adds it as database entry
+        while True:
+            clearTerminal()
+            emotion = input("What am I feeling right now? ")
+
+            if isEmotion(emotion) == True:
+                break
+            else: continue 
+
         mood = input("Today I'm feeling...")
         contentToAdd = (f"{date.today()}", f"{date.today().weekday()}", mood)
 
