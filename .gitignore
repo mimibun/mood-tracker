@@ -178,3 +178,4 @@ cython_debug/
 /test.py
 *.db
 *.csv
+*.json

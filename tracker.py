@@ -1,4 +1,5 @@
 import sqlite3
+import json
 from os import system, name
 from datetime import date
 
@@ -16,6 +17,7 @@ if __name__ == "__main__":
                   id integer PRIMARY KEY AUTOINCREMENT,
                   date text NOT NULL,
                   weekday integer,
+                  emotion text,
                   mood text);''')
     
     
@@ -61,15 +63,23 @@ if __name__ == "__main__":
             else: continue 
 
         mood = input("Today I'm feeling...")
-        contentToAdd = (f"{date.today()}", f"{date.today().weekday()}", mood)
+        contentToAdd = (f"{date.today()}", f"{date.today().weekday()}", emotion, mood)
 
         try:
-            dbCur.execute('''INSERT INTO moods(date, weekday, mood) VALUES (?,?,?)''', contentToAdd)
+            dbCur.execute('''INSERT INTO moods(date, weekday, emotion, mood) VALUES (?,?,?,?)''', contentToAdd)
             db.commit()
 
             input("Entry added! Press ANY to return to main menu...")
         except:
             input("ERROR: Could not write to database. Press ANY to return to main menu...")
+
+
+    def isEmotion(inputEmotion) -> bool:
+        with open("emotions.json", "r") as file:
+            emotions = json.load(file)
+            if inputEmotion in emotions["emotions"]:
+                return True
+            else: return False
 
 
     def viewHistory(): # Prints 'SELECT * FROM moods' query line by line
@@ -102,7 +112,7 @@ if __name__ == "__main__":
             return dbCur.fetchall()
         except:
             return None
-
+        
 
     def parseEntry(entry) -> str:
         d = entry[1]
