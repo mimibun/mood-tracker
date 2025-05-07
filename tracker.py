@@ -73,7 +73,7 @@ if __name__ == "__main__":
 
             print(f"Here is your history ({len(entries)} entries and {countDays(entries)} days):")
             for entry in entries:
-                print(f"{entry[1]} - {DAYNAMES[int(entry[2])]} - {entry[3]}")
+                print(parseEntry(entry))
 
             input("Press ANY to return to main menu...")
 
@@ -97,6 +97,15 @@ if __name__ == "__main__":
             return None
 
 
+    def parseEntry(entry) -> str:
+        d = entry[1]
+        weekday = DAYNAMES[int(entry[2])]
+        emotion = entry[3]
+        mood = entry[4]
+
+        return f"{d} - {weekday} - {emotion} - {mood}"
+
+
     def promptEntryDate(): # Title also explains what function does
         while True:
             clearTerminal()
@@ -107,7 +116,7 @@ if __name__ == "__main__":
             elif getEntryByDate(choice): 
                 entries = getEntryByDate(choice)
                 for entry in entries:
-                    print(f"{entry[1]} - {DAYNAMES[int(entry[2])]} - {entry[3]}")
+                    print(parseEntry(entry))
                 input("Press ANY to return to main menu...")
             else:
                 input("ERROR: Invalid format or no entry with date found! Press ANY to return to main menu...")
