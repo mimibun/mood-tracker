@@ -1,9 +1,8 @@
 import sqlite3
 import json
 from os import system, name
-from datetime import date
+from datetime import datetime
 
-DAYNAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
 def main():
     menu()
@@ -16,7 +15,6 @@ if __name__ == "__main__":
     dbCur.execute('''CREATE TABLE IF NOT EXISTS moods(
                   id integer PRIMARY KEY AUTOINCREMENT,
                   date text NOT NULL,
-                  weekday integer,
                   emotion text,
                   mood text);''')
     
@@ -43,6 +41,9 @@ if __name__ == "__main__":
                 break 
             except: continue
 
+    def t(): # Literally just an alias to get current moment in ISO format
+        return datetime.now().isoformat()
+    
 
     def clearTerminal(): # OS independent terminal clear
         try:
@@ -63,10 +64,12 @@ if __name__ == "__main__":
             else: continue 
 
         mood = input("Today I'm feeling...")
-        contentToAdd = (f"{date.today()}", f"{date.today().weekday()}", emotion, mood)
+        contentToAdd = (t(),
+                        emotion,
+                        mood)
 
         try:
-            dbCur.execute('''INSERT INTO moods(date, weekday, emotion, mood) VALUES (?,?,?,?)''', contentToAdd)
+            dbCur.execute('''INSERT INTO moods(date, emotion, mood) VALUES (?,?,?)''', contentToAdd)
             db.commit()
 
             input("Entry added! Press ANY to return to main menu...")
@@ -108,7 +111,7 @@ if __name__ == "__main__":
 
     def getEntryByDate(date) -> list[list] | None: # Title of func explains what it does
         try:
-            dbCur.execute(f'''SELECT * FROM moods WHERE date = "{date}"''')
+            dbCur.execute(f'''SELECT * FROM moods WHERE date like "%{date}%"''')
             return dbCur.fetchall()
         except:
             return None
@@ -116,9 +119,9 @@ if __name__ == "__main__":
 
     def parseEntry(entry) -> str:
         d = entry[1]
-        weekday = DAYNAMES[int(entry[2])]
-        emotion = entry[3]
-        mood = entry[4]
+        weekday = datetime.fromisoformat(entry[1]).strftime("%A")
+        emotion = entry[2]
+        mood = entry[3]
 
         return f"{d} - {weekday} - {emotion} - {mood}"
 
