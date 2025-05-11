@@ -11,3 +11,8 @@ Regular mood trackers are either restrictive or do not go deep enough in my opin
 - Ability to self-host
 - Creation of nodes on an emotion to emotion basis to potentially receive interesting data
 - Graphing
+
+## Technical WIP:
+
+- Refactor code to several files and seperate functionality (i.e. CLI to CLI, GUI to GUI, DB stuff to DB etc.)
+- Potentially find solution for emotion selection autocomplete without a 3rd party library
