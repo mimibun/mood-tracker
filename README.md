@@ -4,7 +4,7 @@ Currently this is a practice project to have me code more and also have a projec
 
 Regular mood trackers are either restrictive or do not go deep enough in my opinion and thus do not provide conclusive data. This mood tracker is supposed to change this based on design requirements provided by me. One of which being making use of he 87 emotions/experience provided by Brene Brown in her book "Atlas of the Heart". This book is close to my heart which is why evaluating emotions with her work in mind comes natural for me. 
 
-__In the end this project is still just a practicing project, meaning to solve a reallife problem. But I'm not a data analyist nor is this meant to be scientific, just some silly interesting practice project that maybe ends up having an actual usage for.__ 
+__In the end this project is still just a practice project, meaning to solve a reallife problem. But I'm not a data analyst, nor is this meant to be scientific, just some silly interesting practice project that maybe ends up having an actual use for me.__ 
 
 ## Planned features:
 
