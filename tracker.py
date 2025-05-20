@@ -109,12 +109,12 @@ if __name__ == "__main__":
         return days
 
 
-    def getEntryByDate(date) -> list[list] | None: # Title of func explains what it does
+    def getEntryByDate(date) -> list[list]: # Title of func explains what it does
         try:
             dbCur.execute(f'''SELECT * FROM moods WHERE date like "%{date}%"''')
             return dbCur.fetchall()
         except:
-            return None
+            raise Exception("ERROR: Could not read from database. Please check for correct database setup.")
         
 
     def parseEntry(entry) -> str: # Title also explains what what it does
@@ -130,11 +130,11 @@ if __name__ == "__main__":
         while True:
             clearTerminal()
             choice = input("Enter date (format: YYYY-MM-DD) or exit: ")
-
             if choice == "exit":
                 break
-            elif getEntryByDate(choice): 
-                entries = getEntryByDate(choice)
+
+            entries = getEntryByDate(choice)
+            if entries != 0: 
                 for entry in entries:
                     print(parseEntry(entry))
                 input("Press ANY to return to main menu...")
