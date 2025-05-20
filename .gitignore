@@ -176,6 +176,7 @@ cython_debug/
 # Custom
 .git/
 /test.py
+/entry.py
 *.db
 *.csv
 *.json

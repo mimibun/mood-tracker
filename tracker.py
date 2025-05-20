@@ -1,7 +1,7 @@
 import sqlite3
-import json
 from os import system, name
 from datetime import datetime
+from emotions import emotions
 
 
 def main():
@@ -15,10 +15,11 @@ if __name__ == "__main__":
     dbCur.execute('''CREATE TABLE IF NOT EXISTS moods(
                   id integer PRIMARY KEY AUTOINCREMENT,
                   date text NOT NULL,
+                  score INTEGER,
                   emotion text,
-                  mood text);''')
+                  comment text);''')
     
-    
+
     def menu():
         while True:
             try:
@@ -41,6 +42,7 @@ if __name__ == "__main__":
                 break 
             except: continue
 
+
     def t(): # Literally just an alias to get current moment in ISO format
         return datetime.now().isoformat()
     
@@ -55,34 +57,22 @@ if __name__ == "__main__":
 
 
     def writeEntry(): # Asks for mood and adds it as database entry
-        while True:
-            clearTerminal()
-            emotion = input("What am I feeling right now? ")
+        score = getValidInput(question="On a scale from 1-10, how was your day?", type="score")
+        emotion = getValidInput(question="What emotion are you feeling right now?", type="emotion")
+        comment = getValidInput(question="Comment:", type="comment")
 
-            if isEmotion(emotion) == True:
-                break
-            else: continue 
-
-        mood = input("Today I'm feeling...")
         contentToAdd = (t(),
+                        score,
                         emotion,
-                        mood)
+                        comment)
 
         try:
-            dbCur.execute('''INSERT INTO moods(date, emotion, mood) VALUES (?,?,?)''', contentToAdd)
+            dbCur.execute('''INSERT INTO moods(date, score, emotion, comment) VALUES (?,?,?,?)''', contentToAdd)
             db.commit()
 
             input("Entry added! Press ANY to return to main menu...")
         except:
             input("ERROR: Could not write to database. Press ANY to return to main menu...")
-
-
-    def isEmotion(inputEmotion) -> bool:
-        with open("emotions.json", "r") as file:
-            emotions = json.load(file)
-            if inputEmotion in emotions["emotions"]:
-                return True
-            else: return False
 
 
     def viewHistory(): # Prints 'SELECT * FROM moods' query line by line
@@ -120,10 +110,11 @@ if __name__ == "__main__":
     def parseEntry(entry) -> str: # Title also explains what what it does
         d = datetime.fromisoformat(entry[1]).strftime("%Y-%m-%d")
         weekday = datetime.fromisoformat(entry[1]).strftime("%A")
-        emotion = entry[2]
-        mood = entry[3]
+        score = entry[2]
+        emotion = entry[3]
+        comment = entry[4]
 
-        return f"{d} - {weekday} - {emotion} - {mood}"
+        return f"{d} - {weekday} - {score}/10 - {emotion} - {comment}"
 
 
     def promptEntryDate(): # Title also explains what function does
@@ -141,6 +132,45 @@ if __name__ == "__main__":
             else:
                 input("ERROR: Invalid format or no entry with date found! Press ANY to return to main menu...")
                 continue
+
+
+    def getValidInput(question: str, type: str) -> str | int:
+        question = question + " " # This adds a space behind the question
+
+        match type:
+            case "score":
+                while True:
+                    clearTerminal()
+                    score = input(question)
+
+                    try:
+                        score = int(score)
+                        if score > 0 & score <= 10:
+                            return score
+                        else: raise
+                    except:
+                        raise TypeError("oopsies: please provide an integer between 1-10.")
+
+            case "emotion":
+                while True:
+                    clearTerminal()
+                    emotion = input(question)
+
+                    if emotion in list(map(str.lower, emotions)):
+                        return emotion
+                    else:
+                        input("Invalid emotion, please provide correct emotion!")
+                        continue
+
+            case "comment":
+                clearTerminal()
+                comment = input(question)
+                return comment
+            
+            case _: raise TypeError(f"oopsies: {type} is not a allowed type.")
+
+
+
 
 
     main()
