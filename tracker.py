@@ -117,8 +117,8 @@ if __name__ == "__main__":
             return None
         
 
-    def parseEntry(entry) -> str:
-        d = entry[1]
+    def parseEntry(entry) -> str: # Title also explains what what it does
+        d = datetime.fromisoformat(entry[1]).strftime("%Y-%m-%d")
         weekday = datetime.fromisoformat(entry[1]).strftime("%A")
         emotion = entry[2]
         mood = entry[3]
